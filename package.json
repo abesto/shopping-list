@@ -10,6 +10,7 @@
     "jade": "*",
     "less-middleware": "*",
 	"redis": "*",
-	"hiredis": "*"
+	"hiredis": "*",
+	"async": "*"
   }
 }
