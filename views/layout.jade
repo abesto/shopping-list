@@ -1,0 +1,20 @@
+doctype 5
+html
+  head
+    title= title
+
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+
+    script(src='//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2.js')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.10/backbone-min.js')
+
+    link(rel='stylesheet', href='//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css')
+    script(src='//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js')
+
+    script(src='/javascripts/main.js')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    div.container
+      block content

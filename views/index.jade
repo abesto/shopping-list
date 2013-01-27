@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  div.offset2.span8#content
+    h3 Shopping list
+
+  div.modal.hide.fade#new-tab-modal
+    div.modal-header
+      button.close(type='button', data-dismiss='modal') &times;
+      h3 Új fül
+    div.modal-body
+      form.form-horizontal
+        fieldset
+          label Az új fül neve:
+          input(type='text', name='new-tab-name', placeholder='CBA')
+          button(type='submit', class='btn') Felvesz
