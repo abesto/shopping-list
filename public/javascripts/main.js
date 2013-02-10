@@ -237,15 +237,9 @@
         initialize: function () {
             this.newTabView = new NewTabPillView({collection: this.collection}).render();
 
-            this.collection.on('add', this.add, this);
+            this.collection.on('add', this.render, this);
             this.collection.on('remove', this.remove, this);
             this.collection.on('reset', this.render, this);
-        },
-
-        add: function (model, collection, options) {
-            this.newTabView.$el.before(
-                model.pillView.render().$el
-            );
         },
 
         remove: function (model, collection, options) {
@@ -268,7 +262,7 @@
         className: 'tab-content',
 
         initialize: function () {
-            this.collection.on('add', this.add, this);
+            this.collection.on('add', this.render, this);
             this.collection.on('remove', this.remove, this);
             this.collection.on('reset', this.render, this);
             this.render();
@@ -284,10 +278,6 @@
                 this.collection.at(0).pillView.show();
             }
             return this;
-        },
-
-        add: function (model, collection, options) {
-            this.$el.append(model.contentView.render().$el);
         },
 
         remove: function (model, collection, options) {
