@@ -5,7 +5,16 @@
         return 'item';
     }
 
-    var itemKey, itemsKey;
+    var itemKey, itemsKey, fields;
+
+    fields = ['tabId', 'text', 'position', 'done'];
+
+    function updateWithFields(target, source) {
+        var i;
+        for (i = 0; i < fields.length; i += 1) {
+            target[fields[i]] = source[fields[i]];
+        }
+    }
 
     itemKey = exports.itemKey = function itemKey(item) {
         return 'item:' + item;
@@ -16,10 +25,8 @@
     };
 
     exports.create = function (req, res) {
-        var data = {
-            tabId: req.body.tabId,
-            text: req.body.text
-        };
+        var data = {};
+        updateWithFields(data, req.body);
         redis.incr(freeItemKey(), function (err, id) {
             if (err) { return res.send(500, err); }
             data.id = id;
@@ -59,8 +66,7 @@
         redis.get(itemKey(id), function (err, item) {
             if (err) { res.send(500, err); }
             var obj = JSON.parse(item);
-            obj.done = req.body.done;
-            obj.text = req.body.text;
+            updateWithFields(obj, req.body);
             redis.set(itemKey(id), JSON.stringify(obj), function (err) {
                 if (err) { return res.send(500, err); }
                 res.send(obj);

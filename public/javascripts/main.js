@@ -16,6 +16,7 @@
         },
 
         initialize: function () {
+            this.$el.data('view', this);
             this.$td = $('<td>').appendTo(this.$el);
             this.$text = $('<span>').addClass('text').appendTo(this.$td);
             $('<a>')
@@ -66,8 +67,8 @@
             this.collection.on('add', this.add, this);
             this.collection.on('remove', this.remove, this);
             this.collection.on('reset', this.render, this);
-            this.$el.append('<tbody>').append('<tfoot>');
-            this.$tbody = this.$('tbody');
+            this.$tbody = $('<tbody>').sortable({stop: this.refreshPositions});
+            this.$el.append(this.$tbody).append('<tfoot>');
             this.$tfoot = this.$('tfoot').append(
                 '<tr><td colspan="2"><form class="form-inline"><input type="text" name="text"/><input type="submit" value="Felvesz" class="btn"/></form></td></tr>'
             ).addClass('hidden-phone');
@@ -92,12 +93,36 @@
 
         create: function (e) {
             e.preventDefault();
-            var text = this.$('input[name=text]').val().trim();
+            var i, position = 0, text = this.$('input[name=text]').val().trim();
+            if (this.collection.length > 0) {
+                position = this.collection.at(0).get('position');
+                for (i = 1; i < this.collection.length; i += 1) {
+                    position = Math.max(position, this.collection.at(i).get('position'));
+                }
+                position += 1;
+            }
             if (text.length === 0) { return; }
             this.$('input[name=text]').val('');
             this.collection.create({
                 tabId: this.collection.tab.get('id'),
-                text: text
+                text: text,
+                position: position
+            });
+        },
+
+        refreshPositions: function (e, ui) {
+            var i, notLast, positionCollision,
+                view = ui.item.data('view'),
+                model = view.model,
+                collection = model.collection;
+
+            ui.item.parent().children().each(function (position, item) {
+                var model = $(item).data('view').model;
+                if (model.get('position') === position) {
+                    return;
+                }
+                model.set('position', position);
+                model.save();
             });
         }
     });
@@ -105,6 +130,7 @@
     Items = Backbone.Collection.extend({
         url: '/item',
         model: Item,
+        comparator: function (item) { return item.get('position'); },
 
         initialize: function () {
             this.view = new ItemsView({collection: this});
