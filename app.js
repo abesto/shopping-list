@@ -9,11 +9,14 @@ var express = require('express'),
     item = require('./routes/item'),
     http = require('http'),
     path = require('path'),
-    redis = require('redis');
+    redis = require('redis'),
+    _ = require('lodash');
 
 var app = express();
 global.redis = redis.createClient();
 global.redis.select(1);
+_.bindAll(global.redis);
+
 
 app.configure(function () {
     app.set('port', process.env.PORT || 3000);

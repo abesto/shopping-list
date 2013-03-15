@@ -11,6 +11,8 @@
     "less-middleware": "*",
 	"redis": "*",
 	"hiredis": "*",
-	"async": "*"
+	"async": "*",
+	"baconjs": "*",
+	"lodash": "*"
   }
 }
