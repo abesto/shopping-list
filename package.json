@@ -6,13 +6,21 @@
     "start": "node app"
   },
   "dependencies": {
-    "express": "3.1.0",
-    "jade": "*",
-    "less-middleware": "*",
-	"redis": "*",
-	"hiredis": "*",
-	"async": "*",
-	"baconjs": "*",
-	"lodash": "*"
+    "coffee-script": "1.6.*",
+    "express": "3.1.*",
+    "jade": "0.28.*",
+    "less-middleware": "0.1.*",
+    "redis": "0.8.*",
+    "hiredis": "0.1.*",
+    "async": "0.1.*",
+    "baconjs": "0.3.*",
+    "lodash": "1.0.*"
+  },
+  "devDependencies": {
+    "jasmine-node": "1.4.*",
+    "sinon": "1.6.*"
+  },
+  "scripts": {
+    "test": "jasmine-node --coffee spec"
   }
 }
