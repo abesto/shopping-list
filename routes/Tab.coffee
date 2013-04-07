@@ -15,8 +15,8 @@ module.exports = (redis) ->
      list: (req, res) ->
       keys = Bacon.redis.lrange(tabsListKey, 0, -1).mapEach(tabKey)
       tabs = Bacon.redis.mget(keys.filter(notEmpty)).mapEach(JSON.parse)
-      noTabs = keys.filter(empty).map([])
-      tabs.merge(noTabs).respond(res, 200)
+      noTabs = keys.filter(empty)
+      Bacon.respond(res) status: 200, body: tabs.merge(noTabs)
 
     create: (req, res) ->
       id = Bacon.redis.incr('tab').toProperty()
@@ -24,24 +24,26 @@ module.exports = (redis) ->
       json = Bacon.combineTemplate({id: id, text: req.body.text}).map(JSON.stringify)
       create = Bacon.redis.set(key, json)
       addToList = create.flatMap -> Bacon.redis.rpush(tabsListKey, id)
-      json.sampledBy(addToList).respond(res, 201)
+      Bacon.respond(res) status: 201, body: addToList.map(json)
 
     update: (req, res) ->
       id = req.params.id
       key = tabKey(id)
       oldTab = Bacon.redis.get(key).toProperty().map(JSON.parse)
-      tabNotFound = oldTab.map((t) -> t == null).toProperty()
-      idMismatch = oldTab.map((t) -> 'id' of req.body && req.body.id != t.id).toProperty()
-      requestOk = tabNotFound.or(idMismatch).not()
-      newTab = oldTab.filter(requestOk).map((t) -> t.text = req.body.text; t)
-      update = Bacon.redis.set(key, newTab.map(JSON.stringify))
-      update.map(null).respond(res, 204)
-      tabNotFound.filter(isTrue).map({error: 'tab not found'}).respond(res, 404)
-      idMismatch.filter(isTrue).map({error: 'id is read-only'}).respond(res, 400)
+      response = oldTab.flatMap (tab) ->
+        if tab == null
+          Bacon.once(status: 404, body: {error: 'tab not found'})
+        else if 'id' of req.body && req.body.id != tab.id
+          Bacon.once(status: 400, body: {error: 'id is read-only'})
+        else
+          tab.text = req.body.text
+          update = Bacon.redis.set(key, JSON.stringify(tab))
+          update.map(status: 204, body: null)
+      response.respond(res)
 
     delete: (req, res) ->
       id = req.params.id
       lrem = Bacon.redis.lrem(tabsListKey, 0, id)
       del = lrem.flatMap -> Bacon.redis.del(tabKey(id))
-      del.map(null).respond(res, 204)
+      Bacon.respond(res) status: 204, body: del.map(null)
   }

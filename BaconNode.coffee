@@ -1,11 +1,13 @@
 _ = require('lodash')
 
 exports.decorate = (Bacon) ->
-  Bacon.Observable::respond = (res, retCode) ->
-    stream = @endOnError()
-    stream.onValue _.bind(res.send, res, retCode || 200)
-    stream.onError _.bind(res.send, res, 500)
-    stream
+  Bacon.Observable::respond = (res) ->
+    @onValue (response) ->
+      res.send response.status, response.body
+    @onError _.bind(res.send, res, 500)
+
+  Bacon.respond = (res) -> (template) ->
+    Bacon.combineTemplate(template).respond(res)
 
   Bacon.Observable::mapEach = (f) ->
     @map _.partialRight(_.map, f)
